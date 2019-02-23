@@ -1,3 +1,13 @@
+npm init
+npm install 
+then create marzi.js
+npm install express@4.10
+npm install body-parser
+npm install pg-promise
+npm install bluebird
+===========================
+db name   kon6feb2019
+============================
 
 
 ==============create the following in database of postgres===================
