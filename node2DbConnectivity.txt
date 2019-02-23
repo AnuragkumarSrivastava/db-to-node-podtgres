@@ -1,0 +1,88 @@
+
+
+==============create the following in database of postgres===================
+database name   =  medical
+
+table name = tablets
+=================db query for create and insert value into Tablets table=======================
+
+create table tablets(id serial,
+	name varchar,
+	type varchar)
+insert into tablets(name,type) values('crocin','tablets')
+===========================================
+====================marzi.js=======================
+var fs=require('fs')
+var body=require('body-parser')
+var path=require('path')
+var marzi=require('express')
+var promise=require('bluebird')
+var app=marzi();
+var option = {promiseLib:promise}
+var pgp =require('pg-promise')(option)
+var cs='postgres://postgres:root@localhost:5432/medical'
+var db=pgp(cs)
+
+app.set('port',process.env.PORT||4200)
+app.use(body.urlencoded({extended:true}));
+app.use(body.json())
+/* ---------------this is for console error correction---------------- */
+/* app.use(function (req, res, next) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', '*');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    next();
+}); */
+app.get('/',(req,res,next)=>{
+    res.send("database is setup by us")
+})
+
+
+app.get('/medicine',(req,res,next)=>{
+    db.any('select * from tablets').then(
+        (data)=>{
+            res.send(data)
+        }
+    )
+})
+app.post('/add',(req,res,next)=>{
+console.log(req.body)
+    var m=req.body.name;    
+    var t=req.body.type;
+  
+   
+    db.any('insert into tablets(name,type) values($1,$2)',[m,t]).then(
+        (data) => {
+            res.send({ 'message': 'inserted' })
+        }
+    )
+})
+//this code will print in the vb console
+app.listen(app.get('port'),(err)=>{
+    if(err)
+    console.log("server started")
+    else
+    console.log("server started at : http://localhost:4200")
+})
+
+===============================================================================
+===========================process to do db connectivity with node============================
+1) make one folder with the name practice10 of ur choice
+2) then do npm init 
+3) then create one file with the name marzi.js of ur choice
+4) then do npm install express@4.10
+5)then do npm install body-parser
+6)npm install pg-promise
+7)npm install bluebird    (note this is the library of pg-promise)
+8)then copy and paste the code of the marzi.js form above
+9)then run the the command node marzi.js
+10)the outpu will show server started at : http://localhost:5200
+11)then type localhost5200/medicine
+12 then output will show as  [{"id":1,"name":"dolo","type":"tablets"},{"id":2,"name":"crocin","type":"tablets"}]
+
+=================================================================================
+
+
+
+})
