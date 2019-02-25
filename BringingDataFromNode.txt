@@ -1,0 +1,133 @@
+CREATING SERVICE FOR bringing NODE data to FRONTEND 
+===================================================
+1) ng generate service loginService
+2) npm install @angular/http
+3 npm install @angular/cli
+
+======================app.module.ts======== part of code=====
+import{HttpClientModule} from '@angular/common/http';
+import{HttpModule} from '@angular/http'
+import { Http } from '@angular/http';
+
+ ------and add this---------------
+imports: [
+    , HttpClientModule,
+    HttpModule
+  ],
+------------------entire------app.module.ts--------------------
+
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+import { HeaderComponent } from './header/header.component';
+import { FooterComponent } from './footer/footer.component';
+import { HomeComponent } from './home/home.component';
+import { AboutComponent } from './about/about.component';
+import { ContactComponent } from './contact/contact.component';
+import { LoginComponent } from './login/login.component';
+import { MoreComponent } from './more/more.component';
+import { FormsModule } from '@angular/forms';
+import{HttpClientModule} from '@angular/common/http';
+import{HttpModule} from '@angular/http'
+import { Http } from '@angular/http';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    HeaderComponent,
+    FooterComponent,
+    HomeComponent,
+    AboutComponent,
+    ContactComponent,
+    LoginComponent,
+    MoreComponent
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,FormsModule, HttpClientModule,
+    HttpModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+=====================login-service.service.ts==========================
+import { Injectable } from '@angular/core';
+import { Observable, from} from 'rxjs';
+import {HttpClient,HttpHeaders} from '@angular/common/http'
+
+@Injectable({
+  providedIn: 'root'
+})
+export class LoginServiceService {
+  httpOperations={headers:new HttpHeaders({'content-type':'application/json'})
+}
+myurl='http://localhost:4300';
+  constructor(private http:HttpClient) { }
+  getdetails():Observable<any>{
+    console.log("getdetails")
+    return this.http.get(this.myurl+'/medicine',{responseType:'json'})
+  }
+}
+==============================================
+home.component.ts
+===============before code============================
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-home',
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.css']
+})
+export class HomeComponent implements OnInit {
+
+  constructor() { }
+
+  ngOnInit() {
+  }
+
+}
+
+===========we have 2 add these things==========================
+import { Component, OnInit } from '@angular/core';
+import{LoginServiceService} from '../login-service.service'
+import { from } from 'rxjs';
+@Component({
+  selector: 'app-home',
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.css']
+})
+export class HomeComponent implements OnInit {
+anub:any=[]
+  constructor( private loginservice:LoginServiceService) { }
+  getdetails(){
+this.loginservice.getdetails().subscribe((data)=>{
+  this.anub=data;
+  alert(JSON.stringify(data))
+})
+  }
+  ngOnInit() {
+    this.getdetails()
+  }
+
+}
+
+
+
+=========================displaying the data to frontend of home.html============
+<TABLE class="table">
+  <thead>
+    <td>ID</td>
+    <td>NAME</td>
+    <td>TYPE</td>
+  </thead>
+<TR *ngFor="let anub1 of anub">
+  <TD>{{anub1.id}}</TD>
+
+  <TD>{{anub1.name}}</TD>
+  <TD> {{anub1.type}}</TD>
+</TR>
+=====================================================
+
