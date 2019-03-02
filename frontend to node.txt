@@ -1,0 +1,174 @@
+1)inserting data from fromtend to node and to db
+===================================================
+
+home.component.html
+============================================
+<form action="/action_page.php">
+  name: <input type="text" name="FirstName" placeholder="medicine_name" [(ngModel)]="name"><br>
+  type: <input type="text" name="LastName" placeholder="medicine_type"[(ngModel)]="type"><br>
+  <button type="submit" value="Submit" (click)="add(name,type)">add</button>
+  </form>
+================home.component.ts======================================
+ 
+  add(name,type){
+    this.loginservice.addetails(name,type).subscribe((data)=>{
+      this.anub=data;
+      alert(JSON.stringify(data))
+    })
+    }
+  ngOnInit() {
+    this.getdetails()
+  }
+
+}
+======***********=================home.component.ts full========*************========
+import { Component, OnInit } from '@angular/core';
+import{LoginServiceService} from '../login-service.service'
+import { observable} from 'rxjs';
+import { type } from 'os';
+@Component({
+  selector: 'app-home',
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.css']
+})
+export class HomeComponent implements OnInit {
+anub:any=[]
+  constructor( private loginservice:LoginServiceService) { }
+  getdetails(){
+this.loginservice.getdetails().subscribe((data)=>{
+  this.anub=data;
+  //alert(JSON.stringify(data))
+})
+  }
+/* ================this code brings data from html==================== */
+  
+  add(name,type){
+    this.loginservice.addetails(name,type).subscribe((data)=>{
+      this.anub=data;
+      alert(JSON.stringify(data))
+    })
+    }
+
+/* ===============this code brings data from html ends========= */
+  ngOnInit() {
+    this.getdetails()
+  }
+
+}
+***************************************************************************
+===============================marzi.js file============================================
+============this code will add values to db======== */
+
+app.post('/add',(req,res,next)=>{
+console.log(req.body)
+    var m=req.body.name;
+    var t=req.body.type;
+  
+  
+    db.any('insert into tablets(name,type) values($1,$2)',[m,t]).then(
+        (data) => {
+            res.send({ 'message': 'inserted' })
+        }
+    )
+})
+
+/* ==========this code will add values to db ends=====
+
+=================marzi.js full===============
+
+var fs=require('fs')
+var body=require('body-parser')
+var path=require('path')
+var marzi=require('express')
+var promise=require('bluebird')
+var app=marzi();
+var option = {promiseLib:promise}
+var pgp =require('pg-promise')(option)
+var cs='postgres://postgres:root@localhost:5432/medical'
+var db=pgp(cs)
+
+app.set('port',process.env.PORT||4300)
+app.use(body.urlencoded({extended:true}));
+app.use(body.json())
+/* ========================this is for console error correction======================= */
+ app.use(function (req, res, next) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', '*');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    next();
+}); 
+app.get('/',(req,res,next)=>{
+    res.send("database is setup by us")
+})
+
+
+app.get('/medicine',(req,res,next)=>{
+    db.any('select * from tablets').then(
+        (data)=>{
+            res.send(data)
+        }
+    )
+})
+ /* ============this code will add values to db starts======== */
+app.post('/add',(req,res,next)=>{
+console.log(req.body)
+    var m=req.body.name;
+    var t=req.body.type;
+  
+  
+    db.any('insert into tablets(name,type) values($1,$2)',[m,t]).then(
+        (data) => {
+            res.send({ 'message': 'inserted' })
+        }
+    )
+})
+
+/* ==========this code will add values to db ends============= */
+
+//this code will print in the vb console
+app.listen(app.get('port'),(err)=>{
+    if(err)
+    console.log("server started")
+    else
+    console.log("server started at : http://localhost:4300")
+})
+=====================******login-service.service.ts***full code***=============================
+import { Injectable } from '@angular/core';
+import { Observable, from} from 'rxjs';
+import {HttpClient,HttpHeaders} from '@angular/common/http'
+
+@Injectable({
+  providedIn: 'root'
+})
+export class LoginServiceService {
+  httpOperations={headers:new HttpHeaders({'content-type':'application/json'})
+}
+myurl='http://localhost:4300';
+  constructor(private http:HttpClient) { }
+  getdetails():Observable<any>{
+    console.log("getdetails")
+    return this.http.get(this.myurl+'/medicine',{responseType:'json'})
+  }
+  addetails(name,type):Observable<any>{
+    console.log("adding details")
+    return this.http.post(this.myurl+'/add',
+        {
+          name:name,type:type
+        })
+    
+    }
+}
+==========================login-service.service.ts======required code==============================
+addetails(name,type):Observable<any>{
+    console.log("adding details")
+    return this.http.post(this.myurl+'/add',
+        {
+          name:name,type:type
+        })
+    
+    }
+=========================================================
+
+
+}
