@@ -75,7 +75,7 @@ app.listen(app.get('port'),(err)=>{
     else
     console.log("server started at : http://localhost:4200")
 })
-
+})
 ===============================================================================
 ===========================process to do db connectivity with node============================
 1) make one folder with the name practice10 of ur choice
@@ -95,4 +95,4 @@ app.listen(app.get('port'),(err)=>{
 
 
 
-})
+
